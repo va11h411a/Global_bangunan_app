@@ -8,6 +8,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade100, // Background abu-abu muda
       appBar: _buildAppBar(context),
       body: SingleChildScrollView(
         child: Column(
@@ -22,6 +23,11 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: _buildBottomNavBar(context),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        backgroundColor: Theme.of(context).primaryColor,
+        child: const Icon(Icons.headset_mic, color: Colors.white),
+      ),
     );
   }
 
@@ -70,48 +76,20 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // 2. Header dan Promo Member
+
+  // 2. Banner Promo
   Widget _buildHeaderPromo() {
-    return Column(
-      children: [
-        // Gambar 1: Promo Member Untung
-        Container(
-          height: 150,
-          margin: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.red.shade900, // Warna latar belakang merah gelap
-            borderRadius: BorderRadius.circular(15),
-            image: const DecorationImage(
-              image: AssetImage('assets/gambar_membership.png'),
-              fit: BoxFit.cover,
-            ),
-          ),
+    return Container(
+      width: double.infinity,
+      height: 180,
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        image: const DecorationImage(
+          image: AssetImage('assets/gambar_membership.png'),
+          fit: BoxFit.cover,
         ),
-        // Placeholder untuk list Benefit Member
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: GridView.count(
-            physics: const NeverScrollableScrollPhysics(), // Nonaktifkan scroll GridView
-            shrinkWrap: true,
-            crossAxisCount: 3,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: 2.5,
-            children: const [
-              _PromoBenefit(icon: Icons.point_of_sale, text: 'Point Belanja'),
-              _PromoBenefit(icon: Icons.payments, text: 'Pembayaran SPBU'),
-              _PromoBenefit(icon: Icons.shopping_basket, text: 'Tukar Barang'),
-              _PromoBenefit(icon: Icons.local_offer, text: 'Diskon Khusus'),
-              _PromoBenefit(icon: Icons.fastfood, text: 'Pembayaran Makanan'),
-              _PromoBenefit(icon: Icons.directions_bus, text: 'Pembayaran Bus'),
-              _PromoBenefit(icon: Icons.toll, text: 'Pembayaran Tol'),
-              _PromoBenefit(icon: Icons.person, text: 'Harga Khusus Member'),
-              _PromoBenefit(icon: Icons.money_off, text: 'Bebas Biaya Pengantaran'),
-            ],
-          ),
-        ),
-        const Divider(height: 20, thickness: 1, color: Colors.grey),
-      ],
+      ),
     );
   }
 
@@ -123,7 +101,6 @@ class HomeScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -135,21 +112,34 @@ class HomeScreen extends StatelessWidget {
               ),
             ],
           ),
-          GridView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-              childAspectRatio: 2.2,
-              mainAxisSpacing: 5,
-              crossAxisSpacing: 5,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 5,
+                  spreadRadius: 1,
+                ),
+              ],
             ),
-            itemCount: brands.length,
-            itemBuilder: (context, index) {
-              return BrandLogo(logoText: brands[index]);
-            },
+            child: GridView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                childAspectRatio: 2.2,
+                mainAxisSpacing: 5,
+                crossAxisSpacing: 5,
+              ),
+              itemCount: brands.length,
+              itemBuilder: (context, index) {
+                return BrandLogo(logoText: brands[index]);
+              },
+            ),
           ),
-          const SizedBox(height: 15),
         ],
       ),
     );
@@ -214,13 +204,16 @@ class HomeScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 16.0, top: 10.0),
-          child: Row(
-            children: [
-              Icon(Icons.star, color: Theme.of(context).colorScheme.secondary),
-              const SizedBox(width: 5),
-              const Text('Bestseller', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            ],
+          padding: const EdgeInsets.only(left: 16.0, top: 10.0, bottom: 10.0, right: 16.0),
+          child: Center(
+            child: Text(
+              'Bestseller',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+                color: Colors.black87.withOpacity(0.8),
+              ),
+            ),
           ),
         ),
         GridView.builder(
@@ -260,10 +253,10 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
       child: BottomNavigationBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Theme.of(context).primaryColor, // Warna Biru
         elevation: 0,
         selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white.withOpacity(0.7),
+        unselectedItemColor: Colors.white.withOpacity(0.6),
         type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
@@ -271,7 +264,7 @@ class HomeScreen extends StatelessWidget {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Badge(label: Text('0'), child: Icon(Icons.notifications)),
+            icon: Badge(label: Text('0'), child: Icon(Icons.chat_bubble_outline)), // Chat icon
             label: 'Notifikasi',
           ),
           BottomNavigationBarItem(
@@ -305,7 +298,7 @@ class _PromoBenefit extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         CircleAvatar(
-          backgroundColor: Theme.of(context).colorScheme.secondary,
+          backgroundColor: Colors.red, // Pastikan warna merah sesuai design
           radius: 12,
           child: Icon(icon, color: Colors.white, size: 14),
         ),
