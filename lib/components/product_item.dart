@@ -35,13 +35,15 @@ class ProductItem extends StatelessWidget {
           // Bagian Gambar
           Container(
             height: 120,
+            width: double.infinity,
+            padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
               color: Colors.grey.shade100,
               borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-              image: DecorationImage(
-                image: AssetImage(imagePath),
-                fit: BoxFit.cover,
-              ),
+            ),
+            child: Image.asset(
+              imagePath,
+              fit: BoxFit.contain,
             ),
           ),
 

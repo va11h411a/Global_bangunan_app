@@ -258,21 +258,53 @@ class HomeScreen extends StatelessWidget {
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white.withOpacity(0.6),
         type: BottomNavigationBarType.fixed,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: const Icon(Icons.home),
+            activeIcon: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Icon(Icons.home),
+            ),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Badge(label: Text('0'), child: Icon(Icons.chat_bubble_outline)), // Chat icon
+            icon: const Badge(label: Text('0'), child: Icon(Icons.chat_bubble_outline)),
+            activeIcon: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Badge(label: Text('0'), child: Icon(Icons.chat_bubble_outline)),
+            ),
             label: 'Notifikasi',
           ),
           BottomNavigationBarItem(
-            icon: Badge(label: Text('4'), child: Icon(Icons.shopping_cart)),
+            icon: const Badge(label: Text('4'), child: Icon(Icons.shopping_cart)),
+            activeIcon: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Badge(label: Text('4'), child: Icon(Icons.shopping_cart)),
+            ),
             label: 'Cart',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: const Icon(Icons.person),
+            activeIcon: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Icon(Icons.person),
+            ),
             label: 'User',
           ),
         ],
