@@ -1,27 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:global_bangunan_app/components/product_item.dart';
 import 'package:global_bangunan_app/components/brand_logo.dart';
+import 'package:global_bangunan_app/screens/notification_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Determine body content based on selected index
+    Widget bodyContent;
+    if (_selectedIndex == 0) {
+      bodyContent = _buildHomeBody();
+    } else if (_selectedIndex == 1) {
+      bodyContent = const NotificationScreen();
+    } else {
+      // Placeholder for other tabs
+      bodyContent = Center(child: Text('Page Index $_selectedIndex'));
+    }
+
     return Scaffold(
       backgroundColor: Colors.grey.shade100, // Background abu-abu muda
-      appBar: _buildAppBar(context),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeaderPromo(),
-            _buildBrandSection(),
-            _buildHotDeals(context),
-            _buildBestsellerSection(context),
-            const SizedBox(height: 80), // Ruang agar tidak tertutup Bottom Nav Bar
-          ],
-        ),
-      ),
+      // Only show the Home AppBar when on the Home tab
+      appBar: _selectedIndex == 0 ? _buildAppBar(context) : null,
+      // NotificationScreen has its own Scaffold structure if needed, or fills body
+      // Since NotificationScreen has a Scaffold, we need to be careful.
+      // Ideally, NotificationScreen should just be the body content if we want to share the outer Scaffold,
+      // BUT it has a specific AppBar color and structure.
+      // Nesting Scaffolds is acceptable here to let NotificationScreen control its own AppBar.
+      body: bodyContent,
       bottomNavigationBar: _buildBottomNavBar(context),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
@@ -33,6 +53,24 @@ class HomeScreen extends StatelessWidget {
 
   // --- Widget Pembantu ---
 
+  // Refactored Home Body
+  Widget _buildHomeBody() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeaderPromo(),
+          _buildBrandSection(),
+          _buildHotDeals(context),
+          _buildBestsellerSection(context),
+          const SizedBox(
+            height: 80,
+          ), // Ruang agar tidak tertutup Bottom Nav Bar
+        ],
+      ),
+    );
+  }
+
   // 1. App Bar (Bagian Atas)
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
@@ -42,12 +80,12 @@ class HomeScreen extends StatelessWidget {
           // Placeholder Logo Global Bangunan
           // Logo Global Bangunan
           Container(
-             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-             decoration: BoxDecoration(
-               color: Colors.white,
-               borderRadius: BorderRadius.circular(4),
-             ),
-             child: Image.asset(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Image.asset(
               'assets/logo.jpeg',
               height: 30,
               fit: BoxFit.contain,
@@ -76,7 +114,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-
   // 2. Banner Promo
   Widget _buildHeaderPromo() {
     return Container(
@@ -96,7 +133,16 @@ class HomeScreen extends StatelessWidget {
   // 3. Section Brand
   Widget _buildBrandSection() {
     // List placeholder data brand
-    final List<String> brands = ['LEMKRA', 'Hannochs', 'KIRIN', 'Miyako', 'CASTELLI', 'SANYO', 'M-TIGA', 'Dulux'];
+    final List<String> brands = [
+      'LEMKRA',
+      'Hannochs',
+      'KIRIN',
+      'Miyako',
+      'CASTELLI',
+      'SANYO',
+      'M-TIGA',
+      'Dulux',
+    ];
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
@@ -105,10 +151,16 @@ class HomeScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Brand', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const Text(
+                'Brand',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
               TextButton(
                 onPressed: () {},
-                child: const Text('More >', style: TextStyle(color: Colors.blue, fontSize: 14)),
+                child: const Text(
+                  'More >',
+                  style: TextStyle(color: Colors.blue, fontSize: 14),
+                ),
               ),
             ],
           ),
@@ -152,13 +204,19 @@ class HomeScreen extends StatelessWidget {
       children: [
         const Padding(
           padding: EdgeInsets.only(left: 16.0, top: 10.0),
-          child: Text('Hot Deals', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          child: Text(
+            'Hot Deals',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
         ),
         SizedBox(
           height: 100, // Tinggi yang sesuai untuk banner horizontal
           child: ListView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 10.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8.0,
+              vertical: 10.0,
+            ),
             children: [
               // Mengulang banner promo cat (Frame 3.png)
               _buildHotDealBanner(context),
@@ -192,19 +250,48 @@ class HomeScreen extends StatelessWidget {
   Widget _buildBestsellerSection(BuildContext context) {
     // List placeholder data produk
     final List<Map<String, String>> bestsellers = [
-      {'title': 'Kran Tembok', 'price': 'Rp 92.500', 'imagePath': 'assets/produk_1.png'},
-      {'title': 'DULUX PE...', 'price': 'Rp 961.200', 'imagePath': 'assets/produk_2.png'},
-      {'title': 'LED BULB', 'price': 'Rp 113.000', 'imagePath': 'assets/produk_3.png'},
-      {'title': 'LED Premiere', 'price': 'Rp 42.500', 'imagePath': 'assets/produk_4.png'},
-      {'title': 'LED Basic', 'price': 'Rp 26.400', 'imagePath': 'assets/produk_5.png'},
-      {'title': 'LP 3U green', 'price': 'Rp 43.000', 'imagePath': 'assets/produk_6.png'},
+      {
+        'title': 'Kran Tembok',
+        'price': 'Rp 92.500',
+        'imagePath': 'assets/produk_1.png',
+      },
+      {
+        'title': 'DULUX PE...',
+        'price': 'Rp 961.200',
+        'imagePath': 'assets/produk_2.png',
+      },
+      {
+        'title': 'LED BULB',
+        'price': 'Rp 113.000',
+        'imagePath': 'assets/produk_3.png',
+      },
+      {
+        'title': 'LED Premiere',
+        'price': 'Rp 42.500',
+        'imagePath': 'assets/produk_4.png',
+      },
+      {
+        'title': 'LED Basic',
+        'price': 'Rp 26.400',
+        'imagePath': 'assets/produk_5.png',
+      },
+      {
+        'title': 'LP 3U green',
+        'price': 'Rp 43.000',
+        'imagePath': 'assets/produk_6.png',
+      },
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 16.0, top: 10.0, bottom: 10.0, right: 16.0),
+          padding: const EdgeInsets.only(
+            left: 16.0,
+            top: 10.0,
+            bottom: 10.0,
+            right: 16.0,
+          ),
           child: Center(
             child: Text(
               'Bestseller',
@@ -245,12 +332,7 @@ class HomeScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).primaryColor,
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10,
-          ),
-        ],
+        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10)],
       ),
       child: BottomNavigationBar(
         backgroundColor: Theme.of(context).primaryColor, // Warna Biru
@@ -258,6 +340,8 @@ class HomeScreen extends StatelessWidget {
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white.withOpacity(0.6),
         type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex, // Use state variable
+        onTap: _onItemTapped, // Call handler
         items: [
           BottomNavigationBarItem(
             icon: const Icon(Icons.home),
@@ -272,26 +356,39 @@ class HomeScreen extends StatelessWidget {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: const Badge(label: Text('0'), child: Icon(Icons.chat_bubble_outline)),
+            // Updated to be active when selected
+            icon: const Badge(
+              label: Text('0'),
+              child: Icon(Icons.chat_bubble_outline),
+            ),
             activeIcon: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Badge(label: Text('0'), child: Icon(Icons.chat_bubble_outline)),
+              child: const Badge(
+                label: Text('0'),
+                child: Icon(Icons.chat_bubble_outline),
+              ),
             ),
             label: 'Notifikasi',
           ),
           BottomNavigationBarItem(
-            icon: const Badge(label: Text('4'), child: Icon(Icons.shopping_cart)),
+            icon: const Badge(
+              label: Text('4'),
+              child: Icon(Icons.shopping_cart),
+            ),
             activeIcon: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Badge(label: Text('4'), child: Icon(Icons.shopping_cart)),
+              child: const Badge(
+                label: Text('4'),
+                child: Icon(Icons.shopping_cart),
+              ),
             ),
             label: 'Cart',
           ),
@@ -308,10 +405,6 @@ class HomeScreen extends StatelessWidget {
             label: 'User',
           ),
         ],
-        currentIndex: 0,
-        onTap: (index) {
-          // Aksi navigasi
-        },
       ),
     );
   }
