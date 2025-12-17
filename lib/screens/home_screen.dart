@@ -3,6 +3,8 @@ import 'package:global_bangunan_app/components/product_item.dart';
 import 'package:global_bangunan_app/components/brand_logo.dart';
 import 'package:global_bangunan_app/screens/notification_screen.dart';
 
+import 'package:global_bangunan_app/screens/cart_screen.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -27,6 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
       bodyContent = _buildHomeBody();
     } else if (_selectedIndex == 1) {
       bodyContent = const NotificationScreen();
+    } else if (_selectedIndex == 2) {
+      bodyContent = const CartScreen();
     } else {
       // Placeholder for other tabs
       bodyContent = Center(child: Text('Page Index $_selectedIndex'));
