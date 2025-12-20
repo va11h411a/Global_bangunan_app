@@ -1,7 +1,76 @@
 import 'package:flutter/material.dart';
 
-class CartScreen extends StatelessWidget {
-  const CartScreen({super.key});
+class CartScreen extends StatefulWidget {
+  final VoidCallback? onBack;
+
+  const CartScreen({super.key, this.onBack});
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  // Model data sederhana untuk cart item
+  final List<Map<String, dynamic>> _cartItems = [
+    {
+      'title': 'DULUX PENTALITE A923 CEILING PAINT 25KG',
+      'price': 'Rp 961.200',
+      'qty': 2,
+      'isChecked': true,
+      'imagePath': 'assets/produk_2.png',
+    },
+    {
+      'title': 'Kran Tembok',
+      'price': 'Rp 92.500',
+      'qty': 3,
+      'isChecked': false,
+      'imagePath': 'assets/produk_2.png',
+    },
+    {
+      'title': 'LED Premiere',
+      'price': 'Rp 42.500',
+      'qty': 1,
+      'isChecked': false,
+      'imagePath': 'assets/produk_4.png',
+    },
+    {
+      'title': 'LED Alpha',
+      'price': 'Rp 19.900',
+      'qty': 5,
+      'isChecked': false,
+      'imagePath': 'assets/produk_5.png',
+    },
+  ];
+
+  bool _isAllChecked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSelectAllStatus();
+  }
+
+  void _checkSelectAllStatus() {
+    setState(() {
+      _isAllChecked = _cartItems.every((item) => item['isChecked'] == true);
+    });
+  }
+
+  void _toggleItem(int index, bool? val) {
+    setState(() {
+      _cartItems[index]['isChecked'] = val ?? false;
+      _checkSelectAllStatus();
+    });
+  }
+
+  void _toggleAll(bool? val) {
+    setState(() {
+      _isAllChecked = val ?? false;
+      for (var item in _cartItems) {
+        item['isChecked'] = _isAllChecked;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +80,11 @@ class CartScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            // Handle back navigation if needed, or if pushed on stack
+            if (widget.onBack != null) {
+              widget.onBack!();
+            } else {
+              Navigator.of(context).pop();
+            }
           },
         ),
         title: const Text(
@@ -24,38 +97,20 @@ class CartScreen extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: ListView(
+            child: ListView.builder(
               padding: const EdgeInsets.all(16),
-              children: [
-                _buildCartItem(
-                  title: 'DULUX PENTALITE A923 CEILING PAINT 25KG',
-                  price: 'Rp 961.200',
-                  qty: 2,
-                  isChecked: true,
-                  imagePath: 'assets/produk_2.png',
-                ),
-                _buildCartItem(
-                  title: 'Kran Tembok',
-                  price: 'Rp 92.500',
-                  qty: 3,
-                  isChecked: false,
-                  imagePath: 'assets/produk_1.png',
-                ),
-                _buildCartItem(
-                  title: 'LED Premiere',
-                  price: 'Rp 42.500',
-                  qty: 1,
-                  isChecked: false,
-                  imagePath: 'assets/produk_4.png',
-                ),
-                _buildCartItem(
-                  title: 'LED Alpha',
-                  price: 'Rp 19.900',
-                  qty: 5,
-                  isChecked: false,
-                  imagePath: 'assets/produk_5.png',
-                ),
-              ],
+              itemCount: _cartItems.length,
+              itemBuilder: (context, index) {
+                final item = _cartItems[index];
+                return _buildCartItem(
+                  index: index,
+                  title: item['title'],
+                  price: item['price'],
+                  qty: item['qty'],
+                  isChecked: item['isChecked'],
+                  imagePath: item['imagePath'],
+                );
+              },
             ),
           ),
           _buildBottomCheckoutSection(context),
@@ -65,6 +120,7 @@ class CartScreen extends StatelessWidget {
   }
 
   Widget _buildCartItem({
+    required int index,
     required String title,
     required String price,
     required int qty,
@@ -87,8 +143,8 @@ class CartScreen extends StatelessWidget {
             height: 24,
             child: Checkbox(
               value: isChecked,
-              onChanged: (val) {},
-              activeColor: Colors.black, // Adjust as per design
+              onChanged: (val) => _toggleItem(index, val),
+              activeColor: const Color(0xFF2E3192),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -202,8 +258,8 @@ class CartScreen extends StatelessWidget {
         child: Row(
           children: [
             Checkbox(
-              value: false,
-              onChanged: (val) {},
+              value: _isAllChecked,
+              onChanged: _toggleAll,
               fillColor: WidgetStateProperty.resolveWith(
                 (states) => Colors.white,
               ),

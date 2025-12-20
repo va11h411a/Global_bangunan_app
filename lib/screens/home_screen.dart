@@ -4,6 +4,7 @@ import 'package:global_bangunan_app/components/brand_logo.dart';
 import 'package:global_bangunan_app/screens/notification_screen.dart';
 
 import 'package:global_bangunan_app/screens/cart_screen.dart';
+import 'package:global_bangunan_app/screens/user_profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  static const Color _primaryBlue = Color(0xFF2E3192);
 
   void _onItemTapped(int index) {
     setState(() {
@@ -28,12 +30,11 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_selectedIndex == 0) {
       bodyContent = _buildHomeBody();
     } else if (_selectedIndex == 1) {
-      bodyContent = const NotificationScreen();
+      bodyContent = NotificationScreen(onBack: () => _onItemTapped(0));
     } else if (_selectedIndex == 2) {
-      bodyContent = const CartScreen();
+      bodyContent = CartScreen(onBack: () => _onItemTapped(0));
     } else {
-      // Placeholder for other tabs
-      bodyContent = Center(child: Text('Page Index $_selectedIndex'));
+      bodyContent = UserProfileScreen(onBack: () => _onItemTapped(0));
     }
 
     return Scaffold(
@@ -49,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: _buildBottomNavBar(context),
       floatingActionButton: FloatingActionButton(
         onPressed: () {},
-        backgroundColor: Theme.of(context).primaryColor,
+        backgroundColor: _primaryBlue,
         child: const Icon(Icons.headset_mic, color: Colors.white),
       ),
     );
@@ -78,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // 1. App Bar (Bagian Atas)
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: _primaryBlue,
       title: Row(
         children: [
           // Placeholder Logo Global Bangunan
@@ -163,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () {},
                 child: const Text(
                   'More >',
-                  style: TextStyle(color: Colors.blue, fontSize: 14),
+                  style: TextStyle(color: _primaryBlue, fontSize: 14),
                 ),
               ),
             ],
@@ -255,11 +256,6 @@ class _HomeScreenState extends State<HomeScreen> {
     // List placeholder data produk
     final List<Map<String, String>> bestsellers = [
       {
-        'title': 'Kran Tembok',
-        'price': 'Rp 92.500',
-        'imagePath': 'assets/produk_1.png',
-      },
-      {
         'title': 'DULUX PE...',
         'price': 'Rp 961.200',
         'imagePath': 'assets/produk_2.png',
@@ -313,7 +309,8 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(8.0),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2, // 2 kolom sesuai design
-            childAspectRatio: 0.7, // Rasio untuk membuat item lebih panjang
+            childAspectRatio:
+                0.6, // Rasio diubah agar item muat dengan gambar persegi
             mainAxisSpacing: 10,
             crossAxisSpacing: 10,
           ),
@@ -335,11 +332,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildBottomNavBar(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).primaryColor,
+        color: _primaryBlue,
         boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 10)],
       ),
       child: BottomNavigationBar(
-        backgroundColor: Theme.of(context).primaryColor, // Warna Biru
+        backgroundColor: _primaryBlue, // Warna Biru
         elevation: 0,
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white.withOpacity(0.6),
@@ -362,7 +359,7 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             // Updated to be active when selected
             icon: const Badge(
-              label: Text('0'),
+              label: Text('1'),
               child: Icon(Icons.chat_bubble_outline),
             ),
             activeIcon: Container(
@@ -372,7 +369,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Badge(
-                label: Text('0'),
+                label: Text('1'),
                 child: Icon(Icons.chat_bubble_outline),
               ),
             ),
@@ -410,34 +407,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-    );
-  }
-}
-
-// Widget untuk icon dan teks benefit member
-class _PromoBenefit extends StatelessWidget {
-  final IconData icon;
-  final String text;
-
-  const _PromoBenefit({required this.icon, required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        CircleAvatar(
-          backgroundColor: Colors.red, // Pastikan warna merah sesuai design
-          radius: 12,
-          child: Icon(icon, color: Colors.white, size: 14),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          text,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 10, color: Colors.black87),
-        ),
-      ],
     );
   }
 }

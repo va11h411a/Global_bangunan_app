@@ -33,17 +33,18 @@ class ProductItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Bagian Gambar
-          Container(
-            height: 120,
-            width: double.infinity,
-            padding: const EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
-            ),
-            child: Image.asset(
-              imagePath,
-              fit: BoxFit.contain,
+          AspectRatio(
+            aspectRatio: 1.0,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(8),
+                ),
+              ),
+              child: Image.asset(imagePath, fit: BoxFit.contain),
             ),
           ),
 
@@ -87,7 +88,7 @@ class ProductItem extends StatelessWidget {
                 },
               ),
             ],
-          )
+          ),
         ],
       ),
     );
