@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:global_bangunan_app/components/product_item.dart';
 import 'package:global_bangunan_app/components/brand_logo.dart';
 import 'package:global_bangunan_app/screens/notification_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:global_bangunan_app/providers/cart_provider.dart';
 
 import 'package:global_bangunan_app/screens/cart_screen.dart';
 import 'package:global_bangunan_app/screens/user_profile_screen.dart';
@@ -48,11 +50,13 @@ class _HomeScreenState extends State<HomeScreen> {
       // Nesting Scaffolds is acceptable here to let NotificationScreen control its own AppBar.
       body: bodyContent,
       bottomNavigationBar: _buildBottomNavBar(context),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: _primaryBlue,
-        child: const Icon(Icons.headset_mic, color: Colors.white),
-      ),
+      floatingActionButton: _selectedIndex != 2 // Sembunyikan di tab Cart (index 2)
+          ? FloatingActionButton(
+              onPressed: () {},
+              backgroundColor: _primaryBlue,
+              child: const Icon(Icons.headset_mic, color: Colors.white),
+            )
+          : null,
     );
   }
 
@@ -330,6 +334,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // 6. Bottom Navigation Bar
   Widget _buildBottomNavBar(BuildContext context) {
+    final cartCount = Provider.of<CartProvider>(context).uniqueItemCount;
+    
     return Container(
       decoration: BoxDecoration(
         color: _primaryBlue,
@@ -376,9 +382,10 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Notifikasi',
           ),
           BottomNavigationBarItem(
-            icon: const Badge(
-              label: Text('4'),
-              child: Icon(Icons.shopping_cart),
+            icon: Badge(
+              label: Text('$cartCount'),
+              isLabelVisible: cartCount > 0,
+              child: const Icon(Icons.shopping_cart),
             ),
             activeIcon: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
@@ -386,9 +393,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Badge(
-                label: Text('4'),
-                child: Icon(Icons.shopping_cart),
+              child: Badge(
+                label: Text('$cartCount'),
+                isLabelVisible: cartCount > 0,
+                child: const Icon(Icons.shopping_cart),
               ),
             ),
             label: 'Cart',

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:global_bangunan_app/providers/cart_provider.dart';
 
 class ProductItem extends StatelessWidget {
   final String title;
@@ -84,7 +86,20 @@ class ProductItem extends StatelessWidget {
                 icon: const Icon(Icons.shopping_cart_outlined, size: 20),
                 color: Colors.grey.shade600,
                 onPressed: () {
-                  // Aksi tambah ke keranjang
+                  final newItem = CartItem(
+                    id: title, // Simulating unique id
+                    title: title,
+                    price: price,
+                    imagePath: imagePath,
+                  );
+                  Provider.of<CartProvider>(context, listen: false).addItem(newItem);
+                  
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('$title ditambahkan ke keranjang'),
+                      duration: const Duration(seconds: 1),
+                    ),
+                  );
                 },
               ),
             ],

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:global_bangunan_app/providers/cart_provider.dart';
+import 'package:global_bangunan_app/screens/checkout_screen.dart';
 
 class CartScreen extends StatefulWidget {
   final VoidCallback? onBack;
@@ -10,122 +13,71 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
-  // Model data sederhana untuk cart item
-  final List<Map<String, dynamic>> _cartItems = [
-    {
-      'title': 'DULUX PENTALITE A923 CEILING PAINT 25KG',
-      'price': 'Rp 961.200',
-      'qty': 2,
-      'isChecked': true,
-      'imagePath': 'assets/produk_2.png',
-    },
-    {
-      'title': 'Kran Tembok',
-      'price': 'Rp 92.500',
-      'qty': 3,
-      'isChecked': false,
-      'imagePath': 'assets/produk_2.png',
-    },
-    {
-      'title': 'LED Premiere',
-      'price': 'Rp 42.500',
-      'qty': 1,
-      'isChecked': false,
-      'imagePath': 'assets/produk_4.png',
-    },
-    {
-      'title': 'LED Alpha',
-      'price': 'Rp 19.900',
-      'qty': 5,
-      'isChecked': false,
-      'imagePath': 'assets/produk_5.png',
-    },
-  ];
-
-  bool _isAllChecked = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkSelectAllStatus();
-  }
-
-  void _checkSelectAllStatus() {
-    setState(() {
-      _isAllChecked = _cartItems.every((item) => item['isChecked'] == true);
-    });
-  }
-
-  void _toggleItem(int index, bool? val) {
-    setState(() {
-      _cartItems[index]['isChecked'] = val ?? false;
-      _checkSelectAllStatus();
-    });
-  }
-
-  void _toggleAll(bool? val) {
-    setState(() {
-      _isAllChecked = val ?? false;
-      for (var item in _cartItems) {
-        item['isChecked'] = _isAllChecked;
-      }
-    });
-  }
+  // We no longer need local state for items, it's all in CartProvider
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFE2E2E2), // Background #e2e2e2
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            if (widget.onBack != null) {
-              widget.onBack!();
-            } else {
-              Navigator.of(context).pop();
-            }
-          },
-        ),
-        title: const Text(
-          'My Cart (4)',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: const Color(0xFF2E3192), // AppBar #2E3192
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _cartItems.length,
-              itemBuilder: (context, index) {
-                final item = _cartItems[index];
-                return _buildCartItem(
-                  index: index,
-                  title: item['title'],
-                  price: item['price'],
-                  qty: item['qty'],
-                  isChecked: item['isChecked'],
-                  imagePath: item['imagePath'],
-                );
+    return Consumer<CartProvider>(
+      builder: (context, cartProvider, child) {
+        final cartItems = cartProvider.items;
+        
+        return Scaffold(
+          backgroundColor: const Color(0xFFE2E2E2), // Background #e2e2e2
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                if (widget.onBack != null) {
+                  widget.onBack!();
+                } else {
+                  Navigator.of(context).pop();
+                }
               },
             ),
+            title: Text(
+              'My Cart (${cartProvider.uniqueItemCount})',
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            backgroundColor: const Color(0xFF2E3192), // AppBar #2E3192
+            elevation: 0,
           ),
-          _buildBottomCheckoutSection(context),
-        ],
-      ),
+          body: Column(
+            children: [
+              Expanded(
+                child: cartItems.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'Keranjang Anda Kosong',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: cartItems.length,
+                        itemBuilder: (context, index) {
+                          final item = cartItems[index];
+                          return _buildCartItem(
+                            context: context,
+                            index: index,
+                            item: item,
+                            cartProvider: cartProvider,
+                          );
+                        },
+                      ),
+              ),
+              _buildBottomCheckoutSection(context, cartProvider),
+            ],
+          ),
+        );
+      },
     );
   }
 
   Widget _buildCartItem({
+    required BuildContext context,
     required int index,
-    required String title,
-    required String price,
-    required int qty,
-    required bool isChecked,
-    required String imagePath,
+    required CartItem item,
+    required CartProvider cartProvider,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -142,8 +94,8 @@ class _CartScreenState extends State<CartScreen> {
             width: 24,
             height: 24,
             child: Checkbox(
-              value: isChecked,
-              onChanged: (val) => _toggleItem(index, val),
+              value: item.isChecked,
+              onChanged: (val) => cartProvider.toggleItemCheck(index, val ?? false),
               activeColor: const Color(0xFF2E3192),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4),
@@ -159,17 +111,13 @@ class _CartScreenState extends State<CartScreen> {
               border: Border.all(color: Colors.blue.shade100),
               borderRadius: BorderRadius.circular(4),
               image: DecorationImage(
-                image: AssetImage(
-                  imagePath,
-                ), // Use placeholder if asset doesn't exist
+                image: AssetImage(item.imagePath),
                 fit: BoxFit.cover,
-                onError: (exception, stackTrace) {
-                  // Fallback if image not found
-                },
+                onError: (exception, stackTrace) {},
               ),
             ),
             child: Image.asset(
-              imagePath,
+              item.imagePath,
               fit: BoxFit.cover,
               errorBuilder: (c, o, s) => const Icon(Icons.image),
             ),
@@ -181,7 +129,7 @@ class _CartScreenState extends State<CartScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  title,
+                  item.title,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -191,7 +139,7 @@ class _CartScreenState extends State<CartScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  price,
+                  item.price,
                   style: const TextStyle(
                     color: Color(0xFF2E3192),
                     fontWeight: FontWeight.bold,
@@ -202,7 +150,10 @@ class _CartScreenState extends State<CartScreen> {
                 Row(
                   children: [
                     // Quantity Controls
-                    _buildQtyButton(Icons.remove),
+                    InkWell(
+                      onTap: () => cartProvider.decreaseQty(index),
+                      child: _buildQtyButton(Icons.remove),
+                    ),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -214,16 +165,22 @@ class _CartScreenState extends State<CartScreen> {
                         ),
                       ),
                       child: Text(
-                        '$qty',
+                        '${item.qty}',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    _buildQtyButton(Icons.add),
+                    InkWell(
+                      onTap: () => cartProvider.increaseQty(index),
+                      child: _buildQtyButton(Icons.add),
+                    ),
                     const Spacer(),
-                    const Icon(
-                      Icons.delete_outline,
-                      color: Colors.grey,
-                      size: 20,
+                    InkWell(
+                      onTap: () => cartProvider.removeItem(index),
+                      child: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
                     ),
                   ],
                 ),
@@ -247,7 +204,7 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
-  Widget _buildBottomCheckoutSection(BuildContext context) {
+  Widget _buildBottomCheckoutSection(BuildContext context, CartProvider cartProvider) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: const BoxDecoration(
@@ -258,8 +215,8 @@ class _CartScreenState extends State<CartScreen> {
         child: Row(
           children: [
             Checkbox(
-              value: _isAllChecked,
-              onChanged: _toggleAll,
+              value: cartProvider.isAllChecked,
+              onChanged: (val) => cartProvider.toggleAllCheck(val ?? false),
               fillColor: WidgetStateProperty.resolveWith(
                 (states) => Colors.white,
               ),
@@ -273,17 +230,47 @@ class _CartScreenState extends State<CartScreen> {
               ),
             ),
             const Spacer(),
+            Column(
+               crossAxisAlignment: CrossAxisAlignment.end,
+               children: [
+                 const Text('Total:', style: TextStyle(color: Colors.white, fontSize: 12)),
+                 Text(
+                   'Rp ${cartProvider.totalPrice}', 
+                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)
+                 ),
+               ]
+            ),
+            const SizedBox(width: 10),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                final selectedItems = cartProvider.items.where((i) => i.isChecked).toList();
+                if (selectedItems.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Pilih minimal 1 produk untuk checkout!'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+                
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CheckoutScreen(
+                      selectedItems: selectedItems,
+                      totalPrice: cartProvider.totalPrice,
+                    ),
+                  ),
+                );
+              },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(
-                  0xFF4A4EBD,
-                ), // Lighter blue for button
+                backgroundColor: const Color(0xFF4A4EBD), // Lighter blue for button
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 30,
+                  horizontal: 20,
                   vertical: 12,
                 ),
               ),

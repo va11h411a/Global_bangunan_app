@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:global_bangunan_app/screens/login_screen.dart';
+import 'package:global_bangunan_app/screens/splash_screen.dart';
+
+import 'package:provider/provider.dart';
+import 'package:global_bangunan_app/providers/cart_provider.dart';
 
 void main() {
-  runApp(const GlobalBangunanApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => CartProvider()),
+      ],
+      child: const GlobalBangunanApp(),
+    ),
+  );
 }
 
 class GlobalBangunanApp extends StatelessWidget {
@@ -22,7 +32,7 @@ class GlobalBangunanApp extends StatelessWidget {
         fontFamily: 'Roboto', // Contoh font
         useMaterial3: true,
       ),
-      home: const LoginScreen(),
+      home: const SplashScreen(),
     );
   }
 }
